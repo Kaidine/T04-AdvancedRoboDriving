@@ -1,5 +1,6 @@
 package com.example.t04_advancedrobodriving;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.example.t04_advancedrobodriving.databinding.ActivityMainBinding;
+import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 
 import android.widget.Toast;
 import android.view.Menu;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     // BT Variables
     private final String CV_ROBOTNAME = "HIMMYNEUTRON";
+    private BluetoothConnectionService bluetoothConnectionService;
     private BluetoothAdapter cv_btInterface = null;
     private Set<BluetoothDevice> cv_pairedDevices = null;
     private BluetoothDevice cv_btDevice = null;
@@ -52,8 +55,11 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        bluetoothConnectionService = new BluetoothConnectionService(this);
+
         // Need grant permission once per install
-        cpf_checkBTPermissions();
+//        cpf_checkBTPermissions();
+        bluetoothConnectionService.checkBluetoothPermissions(this);
 
         binding.beepButton.setOnClickListener(view -> cpf_EV3PlayTone());
         binding.floatingActionButton.setOnClickListener(view -> {/*Toast.makeText(MainActivity.this, "FAB pressed", Toast.LENGTH_LONG).show()*/});
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.menu_first: cpf_requestBTPermissions();
+            case R.id.menu_first:bluetoothConnectionService.requestBluetoothPermissions(this);
                 return true;
             case R.id.menu_second: cv_btDevice = cpf_locateInPairedBTList(CV_ROBOTNAME);
                 return true;
@@ -163,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    // Modify frmo chap14, pp391 connectToRobot()
+    // Modify from chap14, pp391 connectToRobot()
     private void cpf_connectToEV3(BluetoothDevice bd) {
         try  {
             cv_btSocket = bd.createRfcommSocketToServiceRecord
@@ -191,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
             binding.vvTvOut2.setText("Error in disconnect -> " + e.getMessage());
         }
     }
+
+
 
     // Communication Developer Kit Page 27
     // 4.2.2 Start motor B & C forward at power 50 for 3 rotation and braking at destination
