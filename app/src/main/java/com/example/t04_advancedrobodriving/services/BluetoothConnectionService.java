@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,15 +25,27 @@ import java.util.UUID;
 public class BluetoothConnectionService {
     private final AppCompatActivity activity;
     private final String targetDeviceName;
+    private final ContextCompatWrapper contextCompatWrapper;
 
 
     private BluetoothSocket bluetoothSocket;
     private InputStream socketInputStream;
     private OutputStream socketOutputStream;
 
+<<<<<<< Updated upstream
     public BluetoothConnectionService(AppCompatActivity activity, String targetDeviceName) {
+=======
+    private BluetoothDevice targetDevice;
+
+    public BluetoothConnectionService(
+            AppCompatActivity activity,
+            String targetDeviceName,
+            ContextCompatWrapper contextCompatWrapper
+    ) {
+>>>>>>> Stashed changes
         this.activity = activity;
         this.targetDeviceName = targetDeviceName;
+        this.contextCompatWrapper = contextCompatWrapper;
     }
 
     public boolean checkBluetoothPermissions() {

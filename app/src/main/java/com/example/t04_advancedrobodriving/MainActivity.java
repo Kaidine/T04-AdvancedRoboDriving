@@ -8,11 +8,13 @@ import android.view.MotionEvent;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.t04_advancedrobodriving.databinding.ActivityMainBinding;
 import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Motor;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
+import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -29,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         String robotName = "HIMMYNEUTRON";
-        bluetoothConnectionService = new BluetoothConnectionService(this, robotName);
+        bluetoothConnectionService = new BluetoothConnectionService(this, robotName, new ContextCompatWrapper());
+
         robotControllerService = new EV3ControllerService(bluetoothConnectionService);
 
         binding.motorSpeedBarLabel.setText(String.valueOf(50));
@@ -156,7 +159,4 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(menuItem);
         }
     }
-
-
-
 }
