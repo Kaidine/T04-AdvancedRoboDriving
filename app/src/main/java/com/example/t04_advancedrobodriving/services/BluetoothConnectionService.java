@@ -5,34 +5,29 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.bluetooth.BluetoothStatusCodes;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.t04_advancedrobodriving.MainActivity;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class BluetoothConnectionService implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class BluetoothConnectionService {
     private final AppCompatActivity activity;
     private final String targetDeviceName;
 
 
     private BluetoothSocket bluetoothSocket;
+    private InputStream socketInputStream;
+    private OutputStream socketOutputStream;
 
     public BluetoothConnectionService(AppCompatActivity activity, String targetDeviceName) {
         this.activity = activity;
@@ -54,8 +49,10 @@ public class BluetoothConnectionService implements ActivityCompat.OnRequestPermi
             return;
         }
         if (checkBluetoothPermissions()) {
+            Toast.makeText(activity, "Bluetooth permissions already granted.", Toast.LENGTH_SHORT).show();
             return;
         }
+        Toast.makeText(activity, "Requesting Bluetooth permissions.", Toast.LENGTH_SHORT).show();
 
         ActivityCompat.requestPermissions(activity,
                 new String[]{Manifest.permission.BLUETOOTH_SCAN},
@@ -71,6 +68,7 @@ public class BluetoothConnectionService implements ActivityCompat.OnRequestPermi
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (!checkBluetoothPermissions()) {
+            Toast.makeText(activity, "Bluetooth permissions not granted; requesting permissions.", Toast.LENGTH_SHORT).show();
             requestBluetoothPermissions();
             return;
         }
@@ -83,15 +81,22 @@ public class BluetoothConnectionService implements ActivityCompat.OnRequestPermi
 
 
         if (!optionalBluetoothDevice.isPresent()) {
-            Toast.makeText(activity, "Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "Device not found in list; Pair the bluetooth device named \"" + targetDeviceName + "\" and try again.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         BluetoothDevice targetDevice = optionalBluetoothDevice.get();
         try {
+            Toast.makeText(activity, "Establishing connection to \"" + targetDeviceName + "\"...", Toast.LENGTH_SHORT).show();
             bluetoothSocket = targetDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
             bluetoothSocket.connect();
+            socketInputStream = bluetoothSocket.getInputStream();
+            socketOutputStream = bluetoothSocket.getOutputStream();
+            Toast.makeText(activity, "Successfully connected to \"" + targetDeviceName + "\".", Toast.LENGTH_SHORT).show();
+
         } catch (IOException e) {
+            System.out.println("failed to connect to device.");
+            Toast.makeText(activity, "Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
@@ -99,26 +104,35 @@ public class BluetoothConnectionService implements ActivityCompat.OnRequestPermi
     public void disconnectFromDevice() {
         if (bluetoothSocket != null) {
             try {
+                socketInputStream.close();
+                socketOutputStream.close();
                 bluetoothSocket.close();
+                Toast.makeText(activity, "Successfully disconnected from \"" + targetDeviceName + "\".", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    public BluetoothSocket getBluetoothSocket() {
-        return bluetoothSocket;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        boolean allPermissionsGranted = true;
-        for (int grantResult : grantResults) {
-            allPermissionsGranted = allPermissionsGranted && (grantResult == PackageManager.PERMISSION_GRANTED);
-        }
-
-        if (!allPermissionsGranted) {
+    public void sendCommandToBluetoothDevice(byte[] byteBuffer) {
+        if (!isConnected()){
+            Toast.makeText(activity, "Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.", Toast.LENGTH_SHORT).show();
             connectToDevice();
         }
+
+        try {
+            socketOutputStream.write(byteBuffer);
+            socketOutputStream.flush();
+
+        } catch (IOException ioException) {
+            Toast.makeText(activity, "Failed to open outputStream for sending commands to device.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isConnected() {
+        if (bluetoothSocket == null) {
+            return false;
+        }
+        return bluetoothSocket.isConnected();
     }
 }
