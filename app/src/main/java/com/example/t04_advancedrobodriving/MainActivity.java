@@ -30,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
         binding.beepButton.setOnClickListener(view -> robotControllerService.playTone());
 
-        binding.moveForwardButton.setOnClickListener(view -> robotControllerService.moveMotorsFixedAmount(50, new EV3Motor[]{EV3Motor.B, EV3Motor.C}));
+        binding.moveForwardButton.setOnClickListener(view -> robotControllerService.startRobotMoving(50));
 
-        binding.moveBackwardButton.setOnClickListener(view -> robotControllerService.moveMotorsFixedAmount(-50, new EV3Motor[]{EV3Motor.B, EV3Motor.C}));
+        binding.moveBackwardButton.setOnClickListener(view -> robotControllerService.stopRobotMoving());
     }
 
 
