@@ -152,12 +152,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_third:
                 bluetoothConnectionService.disconnectFromDevice();
                 return true;
-            case R.id.menu_fourth:
-                robotControllerService.moveMotorsFixedAmount(50, new EV3Motor[]{EV3Motor.B, EV3Motor.C});
-                return true;
-            case R.id.menu_fifth:
-                robotControllerService.playTone();
-                return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
