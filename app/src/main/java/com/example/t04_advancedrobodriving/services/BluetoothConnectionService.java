@@ -11,7 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.t04_advancedrobodriving.systemServiceWrappers.ActivityCompatWrapper;
 import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
+import com.example.t04_advancedrobodriving.systemServiceWrappers.ToastWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +37,8 @@ public class BluetoothConnectionService {
     public BluetoothConnectionService(
             AppCompatActivity activity,
             String targetDeviceName,
-            ContextCompatWrapper contextCompatWrapper
-    ) {
+            ContextCompatWrapper contextCompatWrapper,
+            ActivityCompatWrapper ActivityCompatWrapper, ToastWrapper toastWrapper) {
         this.activity = activity;
         this.targetDeviceName = targetDeviceName;
         this.contextCompatWrapper = contextCompatWrapper;
@@ -49,13 +51,13 @@ public class BluetoothConnectionService {
         );
     }
 
-    public void requestBluetoothPermissions() {
+    public boolean requestBluetoothPermissions() {
         final int BLUETOOTH_SCAN_CODE = 100;
         final int BLUETOOTH_CONNECT_CODE = 101;
 
         if (checkBluetoothPermissions()) {
             Toast.makeText(activity, "Bluetooth permissions already granted.", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         Toast.makeText(activity, "Requesting Bluetooth permissions.", Toast.LENGTH_SHORT).show();
 
@@ -66,6 +68,7 @@ public class BluetoothConnectionService {
         ActivityCompat.requestPermissions(activity,
                 new String[]{Manifest.permission.BLUETOOTH_CONNECT},
                 BLUETOOTH_CONNECT_CODE);
+        return false;
     }
 
     @SuppressLint("MissingPermission")
