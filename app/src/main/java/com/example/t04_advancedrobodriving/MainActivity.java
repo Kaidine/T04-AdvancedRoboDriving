@@ -55,14 +55,13 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        bluetoothConnectionService = new BluetoothConnectionService(this);
+        bluetoothConnectionService = new BluetoothConnectionService(this, CV_ROBOTNAME);
 
         // Need grant permission once per install
 //        cpf_checkBTPermissions();
-        bluetoothConnectionService.checkBluetoothPermissions(this);
+        bluetoothConnectionService.connectToDevice();
 
         binding.beepButton.setOnClickListener(view -> cpf_EV3PlayTone());
-        binding.floatingActionButton.setOnClickListener(view -> {/*Toast.makeText(MainActivity.this, "FAB pressed", Toast.LENGTH_LONG).show()*/});
 
         binding.moveForwardButton.setOnClickListener(view -> cpf_EV3MoveForward());
 
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.menu_first:bluetoothConnectionService.requestBluetoothPermissions(this);
+            case R.id.menu_first:bluetoothConnectionService.requestBluetoothPermissions();
                 return true;
             case R.id.menu_second: cv_btDevice = cpf_locateInPairedBTList(CV_ROBOTNAME);
                 return true;
