@@ -6,12 +6,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
 
@@ -32,9 +30,6 @@ public class BluetoothConnectionService {
     private InputStream socketInputStream;
     private OutputStream socketOutputStream;
 
-<<<<<<< Updated upstream
-    public BluetoothConnectionService(AppCompatActivity activity, String targetDeviceName) {
-=======
     private BluetoothDevice targetDevice;
 
     public BluetoothConnectionService(
@@ -42,7 +37,6 @@ public class BluetoothConnectionService {
             String targetDeviceName,
             ContextCompatWrapper contextCompatWrapper
     ) {
->>>>>>> Stashed changes
         this.activity = activity;
         this.targetDeviceName = targetDeviceName;
         this.contextCompatWrapper = contextCompatWrapper;
@@ -50,8 +44,8 @@ public class BluetoothConnectionService {
 
     public boolean checkBluetoothPermissions() {
         return (
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+                contextCompatWrapper.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+                        contextCompatWrapper.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         );
     }
 
@@ -59,9 +53,6 @@ public class BluetoothConnectionService {
         final int BLUETOOTH_SCAN_CODE = 100;
         final int BLUETOOTH_CONNECT_CODE = 101;
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return;
-        }
         if (checkBluetoothPermissions()) {
             Toast.makeText(activity, "Bluetooth permissions already granted.", Toast.LENGTH_SHORT).show();
             return;
@@ -129,7 +120,7 @@ public class BluetoothConnectionService {
     }
 
     public void sendCommandToBluetoothDevice(byte[] byteBuffer) {
-        if (!isConnected()){
+        if (!isConnected()) {
             Toast.makeText(activity, "Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.", Toast.LENGTH_SHORT).show();
             connectToDevice();
         }
