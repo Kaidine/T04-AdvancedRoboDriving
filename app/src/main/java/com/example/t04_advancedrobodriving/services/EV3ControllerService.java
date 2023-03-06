@@ -218,9 +218,9 @@ public class EV3ControllerService {
     }
 
     public void startRobotClawMoving(int speed){
-        byte motorsAsSingleByte = (byte) EV3Motor.A.getByteValue();
+        byte motorsAsSingleByte = EV3Motor.A.getByteValue();
 
-        int syncMovementCommandBufferLength = 15;
+        int syncMovementCommandBufferLength = 12;
         byte[] syncMovementCommandBuffer = new byte[syncMovementCommandBufferLength];
 
         syncMovementCommandBuffer[0] = (byte) (syncMovementCommandBufferLength - 2);    // command length (2 bytes)
@@ -234,7 +234,7 @@ public class EV3ControllerService {
         syncMovementCommandBuffer[5] = 0;
         syncMovementCommandBuffer[6] = 0;
 
-        syncMovementCommandBuffer[7] = EV3Opcode.OUTPUT_STEP_SYNC.getByteValue();  // opcode
+        syncMovementCommandBuffer[7] = EV3Opcode.OUTPUT_SPEED.getByteValue();  // opcode
 
         syncMovementCommandBuffer[8] = 0;                                          // run on layer 0 (LAYER_0)
         syncMovementCommandBuffer[9] = (byte) motorsAsSingleByte;                  // motors   |D|C|B|A|
@@ -245,16 +245,30 @@ public class EV3ControllerService {
         syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
         syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed);
 
-        // set turning ratio. 0 = matching.
-        syncMovementCommandBuffer[12] = (byte) 0x0;                               // LC0 - constant (ratio = 0)
 
-        // tach pulses (rotations), 0=infinite
-        syncMovementCommandBuffer[13] = (byte) 0x0;                               // LC0 - constant (pulses = 0)
+        int startMovementCommandBufferLength = 10;
+        byte[] startMovementCommandBuffer = new byte[startMovementCommandBufferLength];
 
-        //braking level, 0= float, 1 =brake
-        syncMovementCommandBuffer[14] = (byte) 0x01;                               // LC0 - constant (brake)
+        startMovementCommandBuffer[0] = (byte) (startMovementCommandBufferLength - 2);    // command length (2 bytes)
+        startMovementCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        startMovementCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        startMovementCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        startMovementCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        startMovementCommandBuffer[5] = 0;
+        startMovementCommandBuffer[6] = 0;
+
+        startMovementCommandBuffer[7] = EV3Opcode.OUTPUT_START.getByteValue();  // opcode
+
+        startMovementCommandBuffer[8] = 0;                                          // run on layer 0 (LAYER_0)
+        startMovementCommandBuffer[9] = (byte) motorsAsSingleByte;                  // motors   |D|C|B|A|
+        //                      |-|-|-|-|
+        //                      |0|1|1|0| = 0x06
 
         bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+        bluetoothConnectionService.sendCommandToBluetoothDevice(startMovementCommandBuffer);
     }
 
     public void stopRobotClaw(){
