@@ -8,13 +8,10 @@ import android.view.MotionEvent;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.example.t04_advancedrobodriving.databinding.ActivityMainBinding;
-import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Motor;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
-import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -31,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         String robotName = "HIMMYNEUTRON";
-        bluetoothConnectionService = new BluetoothConnectionService(this, robotName, new ContextCompatWrapper());
+        bluetoothConnectionService = new BluetoothConnectionService(this, robotName);
 
         robotControllerService = new EV3ControllerService(bluetoothConnectionService);
 
@@ -44,10 +41,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
         binding.clawSpeedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -56,10 +55,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         binding.moveForwardButton.setOnTouchListener((view, motionEvent) -> {
