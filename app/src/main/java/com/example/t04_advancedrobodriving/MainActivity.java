@@ -10,7 +10,6 @@ import android.widget.SeekBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.t04_advancedrobodriving.databinding.ActivityMainBinding;
-import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Motor;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
 
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         String robotName = "HIMMYNEUTRON";
         bluetoothConnectionService = new BluetoothConnectionService(this, robotName);
+
         robotControllerService = new EV3ControllerService(bluetoothConnectionService);
 
         binding.motorSpeedBarLabel.setText(String.valueOf(50));
@@ -41,10 +41,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
         binding.clawSpeedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -53,10 +55,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         binding.moveForwardButton.setOnTouchListener((view, motionEvent) -> {
@@ -156,7 +160,4 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(menuItem);
         }
     }
-
-
-
 }
