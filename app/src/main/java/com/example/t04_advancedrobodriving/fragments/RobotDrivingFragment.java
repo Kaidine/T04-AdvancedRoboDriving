@@ -13,12 +13,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.t04_advancedrobodriving.MainNavigationActivity;
 import com.example.t04_advancedrobodriving.R;
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotDrivingBinding;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
-import com.example.t04_advancedrobodriving.services.ServiceLocator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,10 +28,6 @@ import com.example.t04_advancedrobodriving.services.ServiceLocator;
  * create an instance of this fragment.
  */
 public class RobotDrivingFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-    // TODO: Rename and change types of parameters
 
     FragmentRobotDrivingBinding binding;
     private EV3ControllerService robotControllerService;
@@ -70,14 +68,9 @@ public class RobotDrivingFragment extends Fragment {
                              Bundle savedInstanceState) {
         String robotName = getString(R.string.robot_name);
 
-        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-
-        BluetoothConnectionService bluetoothConnectionService = new BluetoothConnectionService(getContext(), robotName);
-        robotControllerService = new EV3ControllerService(bluetoothConnectionService);
-        });
+        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> robotControllerService = MainNavigationActivity.getRobotService(getContext(), robotName));
         activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
-//        robotControllerService = ServiceLocator.getInstance().getEv3ControllerServiceInstance();
         binding = FragmentRobotDrivingBinding.inflate(inflater, container, false);
 
         binding.motorSpeedBarLabel.setText(String.valueOf(50));
@@ -152,7 +145,13 @@ public class RobotDrivingFragment extends Fragment {
             return false;
         });
 
-        binding.beepButton.setOnClickListener(view -> robotControllerService.playTone());
+        binding.beepButton.setOnClickListener(view -> {
+            NavHostFragment navHostFragment =
+                    (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host);
+            NavDirections action = RobotDrivingFragmentDirections.actionRobotDrivingFragmentToMusicPlayerFragment();
+            navHostFragment.getNavController().navigate(action);
+
+        });
 
         binding.openClawButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {

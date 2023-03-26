@@ -26,5 +26,10 @@
     <string name="title_activity_nav_host">NavHostActivity</string>
     <string name="title_activity_main_navigation">MainNavigationActivity</string>
     <string name="fragment_robot_driving_label">Drive the Robot</string>
+    <string name="beepButtonText">Play Sound</string>
+    <string name="volume_slider_label_default">50</string>
+    <string name="play_sound_file_button_label">Play Sound File</string>
+    <string name="play_pre_programmed_tune_button_label">Play Preset Tune</string>
+    <string name="volume_slider_label">Volume</string>
 
 </resources>

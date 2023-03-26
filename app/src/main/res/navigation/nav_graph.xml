@@ -8,5 +8,17 @@
         android:id="@+id/robotDrivingFragment"
         android:name="com.example.t04_advancedrobodriving.fragments.RobotDrivingFragment"
         android:label="@string/fragment_robot_driving_label"
-        tools:layout="@layout/fragment_robot_driving" />
+        tools:layout="@layout/fragment_robot_driving" >
+        <action
+            android:id="@+id/action_robotDrivingFragment_to_musicPlayerFragment"
+            app:destination="@id/musicPlayerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/musicPlayerFragment"
+        android:name="com.example.t04_advancedrobodriving.fragments.MusicPlayerFragment"
+        android:label="MusicPlayerFragment" >
+        <action
+            android:id="@+id/action_musicPlayerFragment_to_robotDrivingFragment"
+            app:destination="@id/robotDrivingFragment" />
+    </fragment>
 </navigation>
