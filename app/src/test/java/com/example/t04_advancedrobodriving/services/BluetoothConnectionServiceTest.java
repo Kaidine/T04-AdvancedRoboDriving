@@ -1,13 +1,11 @@
 package com.example.t04_advancedrobodriving.services;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import android.Manifest;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
 
@@ -31,8 +29,7 @@ class BluetoothConnectionServiceTest {
 
         bluetoothConnectionService = new BluetoothConnectionService(
                 mockAppCompatActivity,
-                expectedDeviceName,
-                mockContextCompatWrapper
+                expectedDeviceName
         );
     }
 
