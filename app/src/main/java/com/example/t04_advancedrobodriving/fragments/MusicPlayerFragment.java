@@ -85,6 +85,12 @@ public class MusicPlayerFragment extends Fragment {
             }
         });
 
+        binding.playSoundFileButton.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                robotControllerService.playSoundFile(volume);
+            }
+            return false;
+        });
 
         initializeKeyboardKey(binding.cKey, Note.C, R.color.white);
         initializeKeyboardKey(binding.cSharpKey, Note.C_SHARP, R.color.black);
@@ -111,7 +117,7 @@ public class MusicPlayerFragment extends Fragment {
                 button.setBackgroundColor(getResources().getColor(R.color.teal_700));
                 robotControllerService.startPlayingTone(frequency.getFrequency(), volume);
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                if (initialColor == R.color.black){
+                if (initialColor == R.color.black) {
                     button.bringToFront();
                 }
                 button.setBackgroundColor(getResources().getColor(initialColor));

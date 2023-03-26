@@ -246,7 +246,7 @@ public class EV3ControllerService {
         playToneCommandBuffer[5] = 0;
         playToneCommandBuffer[6] = 0;
 
-        playToneCommandBuffer[7] = EV3Opcode.OUTPUT_PLAY_SOUND.getByteValue();  // opcode
+        playToneCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
 
         playToneCommandBuffer[8] = (byte) 0x01;                                          // Play a tone
         byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
@@ -278,14 +278,42 @@ public class EV3ControllerService {
         playToneCommandBuffer[5] = 0;
         playToneCommandBuffer[6] = 0;
 
-        playToneCommandBuffer[7] = EV3Opcode.OUTPUT_PLAY_SOUND.getByteValue();  // opcode
+        playToneCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
 
         playToneCommandBuffer[8] = 0x00;                                          // Stop playing a tone
 
         bluetoothConnectionService.sendCommandToBluetoothDevice(playToneCommandBuffer);
     }
     public void playSoundFile(int volume){
+        String pathToSoundFile = "/home/root/lms2012/prjs/Sounds/Blip 4";
+        byte[] filePathBytes = pathToSoundFile.getBytes();
 
+        int playSoundFileCommandBufferLength = 12 + filePathBytes.length + 1;
+        byte[] playSoundFileCommandBuffer = new byte[playSoundFileCommandBufferLength];
+
+        playSoundFileCommandBuffer[0] = (byte) (playSoundFileCommandBufferLength - 2);    // command length (2 bytes)
+        playSoundFileCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        playSoundFileCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        playSoundFileCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        playSoundFileCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        playSoundFileCommandBuffer[5] = 0;
+        playSoundFileCommandBuffer[6] = 0;
+
+        playSoundFileCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
+
+        playSoundFileCommandBuffer[8] = (byte) 0x02;                                          // Play a file
+        byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
+
+        playSoundFileCommandBuffer[9] = (byte)0x81; // volume 0-100
+        playSoundFileCommandBuffer[10] = volumeAsBytes[0]; // volume 0-100
+        playSoundFileCommandBuffer[11] = (byte) 0x84;                               // LCS - zero-terminated string to follow
+        System.arraycopy(filePathBytes, 0, playSoundFileCommandBuffer, 12, filePathBytes.length);
+        playSoundFileCommandBuffer[playSoundFileCommandBufferLength - 1] = (byte) 0x00; //zero-terminate file path
+
+        bluetoothConnectionService.sendCommandToBluetoothDevice(playSoundFileCommandBuffer);
     }
-    
+
 }
