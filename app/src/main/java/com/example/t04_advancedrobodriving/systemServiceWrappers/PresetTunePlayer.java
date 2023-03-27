@@ -1,12 +1,9 @@
 package com.example.t04_advancedrobodriving.systemServiceWrappers;
 
 import android.os.SystemClock;
-import android.system.SystemCleaner;
 
 import com.example.t04_advancedrobodriving.Note;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
-
-import java.util.Timer;
 
 public class PresetTunePlayer {
     private PresetTunePlayer() {
