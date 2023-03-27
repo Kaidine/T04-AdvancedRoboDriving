@@ -31,6 +31,6 @@
     <string name="play_sound_file_button_label">Play Sound File</string>
     <string name="play_pre_programmed_tune_button_label">Play Preset Tune</string>
     <string name="volume_slider_label">Volume</string>
-    <string name="music_player_transition_name">Play Some Music</string>
+    <string name="fragment_music_player_label">Play Some Music</string>
 
 </resources>
