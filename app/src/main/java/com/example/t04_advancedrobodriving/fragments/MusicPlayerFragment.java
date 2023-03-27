@@ -7,14 +7,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.SeekBar;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.t04_advancedrobodriving.MainNavigationActivity;
@@ -22,6 +20,10 @@ import com.example.t04_advancedrobodriving.Note;
 import com.example.t04_advancedrobodriving.R;
 import com.example.t04_advancedrobodriving.databinding.FragmentMusicPlayerBinding;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
+import com.example.t04_advancedrobodriving.systemServiceWrappers.PresetTunePlayer;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,18 +94,27 @@ public class MusicPlayerFragment extends Fragment {
             return false;
         });
 
-        initializeKeyboardKey(binding.cKey, Note.C, R.color.white);
-        initializeKeyboardKey(binding.cSharpKey, Note.C_SHARP, R.color.black);
-        initializeKeyboardKey(binding.dKey, Note.D, R.color.white);
-        initializeKeyboardKey(binding.dSharpKey, Note.D_SHARP, R.color.black);
-        initializeKeyboardKey(binding.eKey, Note.E, R.color.white);
-        initializeKeyboardKey(binding.fKey, Note.F, R.color.white);
-        initializeKeyboardKey(binding.fSharpKey, Note.F_SHARP, R.color.black);
-        initializeKeyboardKey(binding.gKey, Note.G, R.color.white);
-        initializeKeyboardKey(binding.gSharpKey, Note.G_SHARP, R.color.black);
-        initializeKeyboardKey(binding.aKey, Note.A, R.color.white);
-        initializeKeyboardKey(binding.aSharpKey, Note.A_SHARP, R.color.black);
-        initializeKeyboardKey(binding.bKey, Note.B, R.color.white);
+        binding.playPreProgrammedTuneButton.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+                executor.submit(() -> PresetTunePlayer.playTwoSpanishDancesOstransky(volume, robotControllerService));
+
+            }
+            return false;
+        });
+
+        initializeKeyboardKey(binding.cKey, Note.C_4, R.color.white);
+        initializeKeyboardKey(binding.cSharpKey, Note.C_SHARP_4, R.color.black);
+        initializeKeyboardKey(binding.dKey, Note.D_4, R.color.white);
+        initializeKeyboardKey(binding.dSharpKey, Note.D_SHARP_4, R.color.black);
+        initializeKeyboardKey(binding.eKey, Note.E_4, R.color.white);
+        initializeKeyboardKey(binding.fKey, Note.F_4, R.color.white);
+        initializeKeyboardKey(binding.fSharpKey, Note.F_SHARP_4, R.color.black);
+        initializeKeyboardKey(binding.gKey, Note.G_4, R.color.white);
+        initializeKeyboardKey(binding.gSharpKey, Note.G_SHARP_4, R.color.black);
+        initializeKeyboardKey(binding.aKey, Note.A_4, R.color.white);
+        initializeKeyboardKey(binding.aSharpKey, Note.A_SHARP_4, R.color.black);
+        initializeKeyboardKey(binding.bKey, Note.B_4, R.color.white);
 
         return binding.getRoot();
     }
