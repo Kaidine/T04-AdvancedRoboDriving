@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:transitionName="@string/music_player_transition_name"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/material_dynamic_neutral95">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/topGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.67" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/blackKeysGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <!-- White buttons -->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dKey"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/eKey"
+        app:layout_constraintStart_toEndOf="@id/cKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/eKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fKey"
+        app:layout_constraintStart_toEndOf="@id/dKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/fKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/gKey"
+        app:layout_constraintStart_toEndOf="@id/eKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/gKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/aKey"
+        app:layout_constraintStart_toEndOf="@id/fKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/aKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bKey"
+        app:layout_constraintStart_toEndOf="@id/gKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/bKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/white"
+        android:translationZ="-999dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/aKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline" />
+
+    <!-- Black androidx.appcompat.widget.AppCompatButtons -->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cSharpKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/black"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/blackKeysGuideline"
+        app:layout_constraintEnd_toEndOf="@id/dKey"
+        app:layout_constraintStart_toStartOf="@id/cKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
+        app:layout_constraintWidth_percent="0.08" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dSharpKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/black"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/blackKeysGuideline"
+        app:layout_constraintEnd_toEndOf="@id/eKey"
+        app:layout_constraintStart_toStartOf="@id/dKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
+        app:layout_constraintWidth_percent="0.08" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/fSharpKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/black"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/blackKeysGuideline"
+        app:layout_constraintEnd_toEndOf="@id/gKey"
+        app:layout_constraintStart_toStartOf="@id/fKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
+        app:layout_constraintWidth_percent="0.08" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/gSharpKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/black"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/blackKeysGuideline"
+        app:layout_constraintEnd_toEndOf="@id/aKey"
+        app:layout_constraintStart_toStartOf="@id/gKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
+        app:layout_constraintWidth_percent="0.08" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/aSharpKey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        android:background="@android:color/black"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/blackKeysGuideline"
+        app:layout_constraintEnd_toEndOf="@id/bKey"
+        app:layout_constraintStart_toStartOf="@id/aKey"
+        app:layout_constraintTop_toTopOf="@id/topGuideline"
+        app:layout_constraintWidth_percent="0.08" />
+
+    <SeekBar
+        android:id="@+id/volumeSlider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="64dp"
+        android:max="100"
+        android:progress="50"
+        app:layout_constraintBottom_toTopOf="@+id/topGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/volumeSliderLabel"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/volumeSliderLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="@string/volume_slider_label_default"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/volumeSlider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/volumeSlider"
+        app:layout_constraintTop_toTopOf="@+id/volumeSlider" />
+
+    <Button
+        android:id="@+id/playSoundFileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/play_sound_file_button_label"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2" />
+
+    <Button
+        android:id="@+id/playPreProgrammedTuneButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="@string/play_pre_programmed_tune_button_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playSoundFileButton" />
+
+    <TextView
+        android:id="@+id/volumeSliderText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="@string/volume_slider_label"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/volumeSlider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

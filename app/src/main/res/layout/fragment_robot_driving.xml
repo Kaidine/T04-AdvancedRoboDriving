@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.RobotDrivingFragment"
+    android:transitionName="@string/app_name"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".RobotDrivingActivity">
+
+        <SeekBar
+            android:id="@+id/clawSpeedBar"
+            android:layout_width="307dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="36dp"
+            android:max="100"
+            android:progress="50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/clawSpeedBarLabel"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/closeClawButton" />
+
+        <Button
+            android:id="@+id/moveForwardButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="32dp"
+            android:foreground="@android:drawable/arrow_up_float"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/moveBackwardButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="32dp"
+            android:foreground="@android:drawable/arrow_down_float"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/beepButton" />
+
+        <Button
+            android:id="@+id/beepButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/beepButtonText"
+            app:layout_constraintEnd_toStartOf="@+id/rightButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/leftButton"
+            app:layout_constraintTop_toBottomOf="@+id/moveForwardButton" />
+
+        <Button
+            android:id="@+id/leftButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:foreground="@android:drawable/arrow_up_float"
+            android:rotation="-90"
+            app:layout_constraintBottom_toBottomOf="@+id/beepButton"
+            app:layout_constraintEnd_toStartOf="@+id/beepButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/beepButton" />
+
+        <Button
+            android:id="@+id/rightButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:foreground="@android:drawable/arrow_up_float"
+            android:rotation="90"
+            app:layout_constraintBottom_toBottomOf="@+id/beepButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/beepButton"
+            app:layout_constraintTop_toTopOf="@+id/beepButton" />
+
+        <Button
+            android:id="@+id/openClawButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_claw_button_text"
+            app:layout_constraintBottom_toBottomOf="@+id/closeClawButton"
+            app:layout_constraintEnd_toStartOf="@+id/closeClawButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/closeClawButton" />
+
+        <Button
+            android:id="@+id/closeClawButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="128dp"
+            android:text="@string/close_claw_button_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/openClawButton"
+            app:layout_constraintTop_toBottomOf="@+id/motorSpeedBar" />
+
+        <TextView
+            android:id="@+id/motorSpeedBarLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/motorSpeedBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/motorSpeedBar"
+            app:layout_constraintTop_toTopOf="@+id/motorSpeedBar" />
+
+        <SeekBar
+            android:id="@+id/motorSpeedBar"
+            android:layout_width="306dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="32dp"
+            android:max="100"
+            android:progress="50"
+            app:layout_constraintEnd_toStartOf="@+id/motorSpeedBarLabel"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/moveBackwardButton" />
+
+        <TextView
+            android:id="@+id/clawSpeedBarLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/clawSpeedBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/clawSpeedBar"
+            app:layout_constraintTop_toTopOf="@+id/clawSpeedBar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

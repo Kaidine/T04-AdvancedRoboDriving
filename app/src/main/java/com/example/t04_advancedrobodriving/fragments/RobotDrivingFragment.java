@@ -1,36 +1,77 @@
-package com.example.t04_advancedrobodriving;
+package com.example.t04_advancedrobodriving.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.t04_advancedrobodriving.databinding.ActivityMainBinding;
+import com.example.t04_advancedrobodriving.MainNavigationActivity;
+import com.example.t04_advancedrobodriving.R;
+import com.example.t04_advancedrobodriving.databinding.FragmentRobotDrivingBinding;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
 
-public class MainActivity extends AppCompatActivity {
-    private ActivityMainBinding binding;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link RobotDrivingFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class RobotDrivingFragment extends Fragment {
 
-    private BluetoothConnectionService bluetoothConnectionService;
+    FragmentRobotDrivingBinding binding;
     private EV3ControllerService robotControllerService;
+
+    public RobotDrivingFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment RobotDrivingFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static RobotDrivingFragment newInstance() {
+        RobotDrivingFragment fragment = new RobotDrivingFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        String robotName = getString(R.string.robot_name);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> robotControllerService = MainNavigationActivity.getRobotService(getContext(), robotName));
+        activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
-        String robotName = "HIMMYNEUTRON";
-        bluetoothConnectionService = new BluetoothConnectionService(this, robotName);
-
-        robotControllerService = new EV3ControllerService(bluetoothConnectionService);
+        binding = FragmentRobotDrivingBinding.inflate(inflater, container, false);
 
         binding.motorSpeedBarLabel.setText(String.valueOf(50));
         binding.clawSpeedBarLabel.setText(String.valueOf(50));
@@ -65,15 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
         binding.moveForwardButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                binding.moveForwardButton.setBackgroundColor(getResources().getColor(R.color.teal_700));
+                binding.moveForwardButton.setBackgroundColor(RobotDrivingFragment.this.getResources().getColor(R.color.teal_700));
                 robotControllerService.startRobotMoving(binding.motorSpeedBar.getProgress());
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                binding.moveForwardButton.setBackgroundColor(getResources().getColor(R.color.purple_200));
+                binding.moveForwardButton.setBackgroundColor(RobotDrivingFragment.this.getResources().getColor(R.color.purple_200));
                 robotControllerService.stopRobotMoving();
             }
             return false;
         });
-
         binding.moveBackwardButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 binding.moveBackwardButton.setBackgroundColor(getResources().getColor(R.color.teal_700));
@@ -84,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
         binding.leftButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 binding.leftButton.setBackgroundColor(getResources().getColor(R.color.teal_700));
@@ -95,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
         binding.rightButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 binding.rightButton.setBackgroundColor(getResources().getColor(R.color.teal_700));
@@ -107,7 +145,13 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        binding.beepButton.setOnClickListener(view -> robotControllerService.playTone());
+        binding.beepButton.setOnClickListener(view -> {
+            NavHostFragment navHostFragment =
+                    (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host);
+            NavDirections action = RobotDrivingFragmentDirections.actionRobotDrivingFragmentToMusicPlayerFragment();
+            navHostFragment.getNavController().navigate(action);
+
+        });
 
         binding.openClawButton.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -130,34 +174,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        bluetoothConnectionService.disconnectFromDevice();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.menu_first:
-                bluetoothConnectionService.requestBluetoothPermissions();
-                return true;
-            case R.id.menu_second:
-                bluetoothConnectionService.connectToDevice();
-                return true;
-            case R.id.menu_third:
-                bluetoothConnectionService.disconnectFromDevice();
-                return true;
-            default:
-                return super.onOptionsItemSelected(menuItem);
-        }
+        return binding.getRoot();
     }
 }

@@ -2,14 +2,15 @@ package com.example.t04_advancedrobodriving.services;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
-    private final AppCompatActivity activity;
+    private final Context context;
     private final String targetDeviceName;
 
 
@@ -29,47 +30,27 @@ public class BluetoothConnectionService {
     private InputStream socketInputStream;
     private OutputStream socketOutputStream;
 
-    public BluetoothConnectionService(AppCompatActivity activity, String targetDeviceName) {
-        this.activity = activity;
+    public BluetoothConnectionService(Context context, String targetDeviceName) {
+        this.context = context;
         this.targetDeviceName = targetDeviceName;
+
     }
 
     public boolean checkBluetoothPermissions() {
         return (
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         );
     }
 
-    public void requestBluetoothPermissions() {
-        final int BLUETOOTH_SCAN_CODE = 100;
-        final int BLUETOOTH_CONNECT_CODE = 101;
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return;
-        }
-        if (checkBluetoothPermissions()) {
-            Toast.makeText(activity, "Bluetooth permissions already granted.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Toast.makeText(activity, "Requesting Bluetooth permissions.", Toast.LENGTH_SHORT).show();
-
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.BLUETOOTH_SCAN},
-                BLUETOOTH_SCAN_CODE);
-
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.BLUETOOTH_CONNECT},
-                BLUETOOTH_CONNECT_CODE);
-    }
 
     @SuppressLint("MissingPermission")
     public void connectToDevice() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (!checkBluetoothPermissions()) {
-            Toast.makeText(activity, "Bluetooth permissions not granted; requesting permissions.", Toast.LENGTH_SHORT).show();
-            requestBluetoothPermissions();
+            displayStatusMessage("Bluetooth permissions not granted.");
             return;
         }
 
@@ -81,22 +62,21 @@ public class BluetoothConnectionService {
 
 
         if (!optionalBluetoothDevice.isPresent()) {
-            Toast.makeText(activity, "Device not found in list; Pair the bluetooth device named \"" + targetDeviceName + "\" and try again.", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Device not found in list; Pair the bluetooth device named \"" + targetDeviceName + "\" and try again.");
             return;
         }
 
         BluetoothDevice targetDevice = optionalBluetoothDevice.get();
         try {
-            Toast.makeText(activity, "Establishing connection to \"" + targetDeviceName + "\"...", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Establishing connection to \"" + targetDeviceName + "\"...");
             bluetoothSocket = targetDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
             bluetoothSocket.connect();
             socketInputStream = bluetoothSocket.getInputStream();
             socketOutputStream = bluetoothSocket.getOutputStream();
-            Toast.makeText(activity, "Successfully connected to \"" + targetDeviceName + "\".", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Successfully connected to \"" + targetDeviceName + "\".");
 
         } catch (IOException e) {
-            System.out.println("failed to connect to device.");
-            Toast.makeText(activity, "Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.");
             e.printStackTrace();
         }
     }
@@ -107,7 +87,7 @@ public class BluetoothConnectionService {
                 socketInputStream.close();
                 socketOutputStream.close();
                 bluetoothSocket.close();
-                Toast.makeText(activity, "Successfully disconnected from \"" + targetDeviceName + "\".", Toast.LENGTH_SHORT).show();
+                displayStatusMessage("Successfully disconnected from \"" + targetDeviceName + "\".");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -115,8 +95,9 @@ public class BluetoothConnectionService {
     }
 
     public void sendCommandToBluetoothDevice(byte[] byteBuffer) {
+
         if (!isConnected()){
-            Toast.makeText(activity, "Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.");
             connectToDevice();
         }
 
@@ -125,7 +106,7 @@ public class BluetoothConnectionService {
             socketOutputStream.flush();
 
         } catch (IOException ioException) {
-            Toast.makeText(activity, "Failed to open outputStream for sending commands to device.", Toast.LENGTH_SHORT).show();
+            displayStatusMessage("Failed to open outputStream for sending commands to device.");
         }
     }
 
@@ -134,5 +115,10 @@ public class BluetoothConnectionService {
             return false;
         }
         return bluetoothSocket.isConnected();
+    }
+
+    private void displayStatusMessage(String message) {
+        System.out.println(message);
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }

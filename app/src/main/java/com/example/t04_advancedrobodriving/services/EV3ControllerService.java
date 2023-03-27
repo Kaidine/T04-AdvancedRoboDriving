@@ -13,51 +13,6 @@ public class EV3ControllerService {
         this.bluetoothConnectionService = bluetoothConnectionService;
     }
 
-    public void moveMotorsFixedAmount(int speed, EV3Motor[] motorsToMove) {
-        byte motorsAsSingleByte = 0b0000;
-        for (EV3Motor motor :
-                motorsToMove) {
-            motorsAsSingleByte = (byte) (motorsAsSingleByte ^ motor.getByteValue());
-        }
-
-        byte[] buffer = new byte[20];
-        buffer[0] = (byte) (0x12);// 0x12 command length
-        buffer[1] = 0;
-
-        buffer[2] = 34;
-        buffer[3] = 12;
-
-        buffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
-
-        buffer[5] = 0;
-        buffer[6] = 0;
-
-        buffer[7] = EV3Opcode.OUTPUT_STEP_SPEED.getByteValue(); // opcode 0xae - opOUTPUT_STEP_SPEED
-        buffer[8] = 0;                                          // LC0(LAYER_0)
-
-        buffer[9] = (byte) motorsAsSingleByte;                  // LC0(0x06) - motors   |D|C|B|A|
-                                                                //                      |-|-|-|-|
-                                                                //                      |0|1|1|0| = 0x06
-        buffer[10] = (byte) 0x81;                               // LC1 - speed, one byte to follow
-
-        buffer[11] = TwosComplementConverter                    // speed (signed 2's complement)
-                .convertIntToTwosComplement(speed);
-
-        buffer[12] = 0;                                         // no Step1 - full speed from start)
-
-        buffer[13] = (byte) 0x82;                               // LC2 - Step 2 (duration), 2 bytes to follow
-        buffer[14] = (byte) 0x84;                               // little endian - least significant bits of rotation
-        buffer[15] = (byte) 0x03;                               // total 0x0384 = 900 degrees
-
-        buffer[16] = (byte) 0x82;                               // LC2 - step 3 (duration), 2 bytes to follow
-        buffer[17] = (byte) 0xB4;                               //
-        buffer[18] = (byte) 0x00;                               // total 0x00b4 = 180 degrees
-
-        buffer[19] = 1;                                         // LC0(1) - brake
-
-        bluetoothConnectionService.sendCommandToBluetoothDevice(buffer);
-    }
-
     public void playTone() {
         byte[] buffer = new byte[17];       // 0x0f command length
 
@@ -89,7 +44,7 @@ public class EV3ControllerService {
         bluetoothConnectionService.sendCommandToBluetoothDevice(buffer);
     }
 
-    public void startRobotMoving(int speed){
+    public void startRobotMoving(int speed) {
         byte motorsAsSingleByte = (byte) (EV3Motor.B.getByteValue() ^ EV3Motor.C.getByteValue());
 
         int syncMovementCommandBufferLength = 15;
@@ -110,12 +65,12 @@ public class EV3ControllerService {
 
         syncMovementCommandBuffer[8] = 0;                                          // run on layer 0 (LAYER_0)
         syncMovementCommandBuffer[9] = (byte) motorsAsSingleByte;                  // motors   |D|C|B|A|
-                                                                //                      |-|-|-|-|
-                                                                //                      |0|1|1|0| = 0x06
+        //                      |-|-|-|-|
+        //                      |0|1|1|0| = 0x06
 
         //set speed
         syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
-        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed);
+        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
 
         // set turning ratio. 0 = matching.
         syncMovementCommandBuffer[12] = (byte) 0x0;                               // LC0 - constant (ratio = 0)
@@ -129,11 +84,11 @@ public class EV3ControllerService {
         bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
-    public void stopRobotMoving(){
-       startRobotMoving(0);
+    public void stopRobotMoving() {
+        startRobotMoving(0);
     }
 
-    public void startRobotTurningLeft(int speed){
+    public void startRobotTurningLeft(int speed) {
         byte motorsAsSingleByte = (byte) (EV3Motor.B.getByteValue() ^ EV3Motor.C.getByteValue());
 
         int syncMovementCommandBufferLength = 17;
@@ -159,7 +114,7 @@ public class EV3ControllerService {
 
         //set speed
         syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
-        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed);
+        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
 
         // set turning ratio. 0 = matching.
         syncMovementCommandBuffer[12] = (byte) 0x82;                               // LC0 - constant (ratio = -200)
@@ -175,7 +130,7 @@ public class EV3ControllerService {
         bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
-    public void startRobotTurningRight(int speed){
+    public void startRobotTurningRight(int speed) {
         byte motorsAsSingleByte = (byte) (EV3Motor.B.getByteValue() ^ EV3Motor.C.getByteValue());
 
         int syncMovementCommandBufferLength = 17;
@@ -201,7 +156,7 @@ public class EV3ControllerService {
 
         //set speed
         syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
-        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed);
+        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
 
         // set turning ratio. 0 = matching.
         syncMovementCommandBuffer[12] = (byte) 0x82;                               // LC0 - constant (ratio = -200)
@@ -217,7 +172,7 @@ public class EV3ControllerService {
         bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
-    public void startRobotClawMoving(int speed){
+    public void startRobotClawMoving(int speed) {
         byte motorsAsSingleByte = EV3Motor.A.getByteValue();
 
         int syncMovementCommandBufferLength = 12;
@@ -243,7 +198,7 @@ public class EV3ControllerService {
 
         //set speed
         syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
-        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed);
+        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
 
 
         int startMovementCommandBufferLength = 10;
@@ -271,9 +226,94 @@ public class EV3ControllerService {
         bluetoothConnectionService.sendCommandToBluetoothDevice(startMovementCommandBuffer);
     }
 
-    public void stopRobotClaw(){
+    public void stopRobotClaw() {
         startRobotClawMoving(0);
     }
 
+    public void startPlayingTone(int frequency, int volume) {
+
+        int playToneCommandBufferLength = 15;
+        byte[] playToneCommandBuffer = new byte[playToneCommandBufferLength];
+
+        playToneCommandBuffer[0] = (byte) (playToneCommandBufferLength - 2);    // command length (2 bytes)
+        playToneCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        playToneCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        playToneCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        playToneCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        playToneCommandBuffer[5] = 0;
+        playToneCommandBuffer[6] = 0;
+
+        playToneCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
+
+        playToneCommandBuffer[8] = (byte) 0x01;                                          // Play a tone
+        byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
+
+        playToneCommandBuffer[9] = (byte)0x81; // volume 0-100
+        playToneCommandBuffer[10] = volumeAsBytes[0]; // volume 0-100
+        playToneCommandBuffer[11] = (byte) 0x82;                               // LC2 - two bytes to follow
+        byte[] frequencyAsBytes = TwosComplementConverter.convertIntToTwosComplement(frequency);
+        playToneCommandBuffer[12] = frequencyAsBytes[0]; //frequency 250-10000
+        playToneCommandBuffer[13] = frequencyAsBytes[1]; //frequency 250-10000
+        playToneCommandBuffer[14] = 0x0; //duration 0 = infinite
+
+        bluetoothConnectionService.sendCommandToBluetoothDevice(playToneCommandBuffer);
+    }
+
+    public void stopPlayingTone() {
+
+        int playToneCommandBufferLength = 9;
+        byte[] playToneCommandBuffer = new byte[playToneCommandBufferLength];
+
+        playToneCommandBuffer[0] = (byte) (playToneCommandBufferLength - 2);    // command length (2 bytes)
+        playToneCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        playToneCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        playToneCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        playToneCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        playToneCommandBuffer[5] = 0;
+        playToneCommandBuffer[6] = 0;
+
+        playToneCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
+
+        playToneCommandBuffer[8] = 0x00;                                          // Stop playing a tone
+
+        bluetoothConnectionService.sendCommandToBluetoothDevice(playToneCommandBuffer);
+    }
+    public void playSoundFile(int volume){
+        String pathToSoundFile = "/home/root/lms2012/prjs/Sounds/Blip 4";
+        byte[] filePathBytes = pathToSoundFile.getBytes();
+
+        int playSoundFileCommandBufferLength = 12 + filePathBytes.length + 1;
+        byte[] playSoundFileCommandBuffer = new byte[playSoundFileCommandBufferLength];
+
+        playSoundFileCommandBuffer[0] = (byte) (playSoundFileCommandBufferLength - 2);    // command length (2 bytes)
+        playSoundFileCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        playSoundFileCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        playSoundFileCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        playSoundFileCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        playSoundFileCommandBuffer[5] = 0;
+        playSoundFileCommandBuffer[6] = 0;
+
+        playSoundFileCommandBuffer[7] = EV3Opcode.PLAY_SOUND.getByteValue();  // opcode
+
+        playSoundFileCommandBuffer[8] = (byte) 0x02;                                          // Play a file
+        byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
+
+        playSoundFileCommandBuffer[9] = (byte)0x81; // volume 0-100
+        playSoundFileCommandBuffer[10] = volumeAsBytes[0]; // volume 0-100
+        playSoundFileCommandBuffer[11] = (byte) 0x84;                               // LCS - zero-terminated string to follow
+        System.arraycopy(filePathBytes, 0, playSoundFileCommandBuffer, 12, filePathBytes.length);
+        playSoundFileCommandBuffer[playSoundFileCommandBufferLength - 1] = (byte) 0x00; //zero-terminate file path
+
+        bluetoothConnectionService.sendCommandToBluetoothDevice(playSoundFileCommandBuffer);
+    }
 
 }
