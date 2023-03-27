@@ -16,7 +16,7 @@
     <fragment
         android:id="@+id/musicPlayerFragment"
         android:name="com.example.t04_advancedrobodriving.fragments.MusicPlayerFragment"
-        android:label="MusicPlayerFragment" >
+        android:label="@string/fragment_music_player_label" >
         <action
             android:id="@+id/action_musicPlayerFragment_to_robotDrivingFragment"
             app:destination="@id/robotDrivingFragment" />
