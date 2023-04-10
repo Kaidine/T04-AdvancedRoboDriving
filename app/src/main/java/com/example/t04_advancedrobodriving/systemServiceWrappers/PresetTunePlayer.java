@@ -10,8 +10,8 @@ public class PresetTunePlayer {
     }
 
     public static void playTwoSpanishDancesOstransky(int volume, EV3ControllerService robotControllerService) {
-        //60 bpm, 4/4 time
-        int quarterNote = 1000;
+        //80 bpm, 4/4 time
+        int quarterNote = 750;
         int dottedHalfNote = quarterNote * 3;
         int dottedQuarterNote = (int) Math.floor(quarterNote * 1.5);
         int eighthNote = quarterNote / 2;

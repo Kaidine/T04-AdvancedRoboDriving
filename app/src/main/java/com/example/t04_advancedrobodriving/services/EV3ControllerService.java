@@ -7,10 +7,15 @@ import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Opcode;
 
 public class EV3ControllerService {
 
-    private final BluetoothConnectionService bluetoothConnectionService;
+    private static EV3ControllerService INSTANCE;
+    private EV3ControllerService() {
+    }
 
-    public EV3ControllerService(BluetoothConnectionService bluetoothConnectionService) {
-        this.bluetoothConnectionService = bluetoothConnectionService;
+    public static EV3ControllerService instance(){
+        if (INSTANCE == null){
+            INSTANCE = new EV3ControllerService();
+        }
+        return INSTANCE;
     }
 
     public void playTone() {
@@ -41,7 +46,7 @@ public class EV3ControllerService {
         buffer[15] = (byte) 0xe8;
         buffer[16] = (byte) 0x03;
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(buffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(buffer);
     }
 
     public void startRobotMoving(int speed) {
@@ -81,7 +86,7 @@ public class EV3ControllerService {
         //braking level, 0= float, 1 =brake
         syncMovementCommandBuffer[14] = (byte) 0x01;                               // LC0 - constant (brake)
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
     public void stopRobotMoving() {
@@ -127,7 +132,7 @@ public class EV3ControllerService {
         //braking level, 0= float, 1 =brake
         syncMovementCommandBuffer[16] = (byte) 0x01;                               // LC0 - constant (brake)
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
     public void startRobotTurningRight(int speed) {
@@ -169,7 +174,7 @@ public class EV3ControllerService {
         //braking level, 0= float, 1 =brake
         syncMovementCommandBuffer[16] = (byte) 0x01;                               // LC0 - constant (brake)
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
     public void startRobotClawMoving(int speed) {
@@ -222,8 +227,8 @@ public class EV3ControllerService {
         //                      |-|-|-|-|
         //                      |0|1|1|0| = 0x06
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(syncMovementCommandBuffer);
-        bluetoothConnectionService.sendCommandToBluetoothDevice(startMovementCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(startMovementCommandBuffer);
     }
 
     public void stopRobotClaw() {
@@ -259,7 +264,7 @@ public class EV3ControllerService {
         playToneCommandBuffer[13] = frequencyAsBytes[1]; //frequency 250-10000
         playToneCommandBuffer[14] = 0x0; //duration 0 = infinite
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(playToneCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(playToneCommandBuffer);
     }
 
     public void stopPlayingTone() {
@@ -282,7 +287,7 @@ public class EV3ControllerService {
 
         playToneCommandBuffer[8] = 0x00;                                          // Stop playing a tone
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(playToneCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(playToneCommandBuffer);
     }
     public void playSoundFile(int volume){
         String pathToSoundFile = "/home/root/lms2012/prjs/Sounds/Blip 4";
@@ -313,7 +318,7 @@ public class EV3ControllerService {
         System.arraycopy(filePathBytes, 0, playSoundFileCommandBuffer, 12, filePathBytes.length);
         playSoundFileCommandBuffer[playSoundFileCommandBufferLength - 1] = (byte) 0x00; //zero-terminate file path
 
-        bluetoothConnectionService.sendCommandToBluetoothDevice(playSoundFileCommandBuffer);
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(playSoundFileCommandBuffer);
     }
 
 }

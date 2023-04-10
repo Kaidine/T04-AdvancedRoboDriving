@@ -1,36 +1,31 @@
 <resources>
+    <!--    Global-->
     <string name="app_name">T04-AdvancedRoboDriving</string>
-    <string name="menu_first">1. Grant Permission</string>
-    <string name="menu_second">2. Connect to EV3</string>
-    <string name="menu_third">3. Disconnect EV3</string>
-    <string name="open_claw_button_text">Open Claw</string>
-    <string name="close_claw_button_text">Close Claw</string>
     <string name="robot_name">HIMMYNEUTRON</string>
 
+    <!-- Navigation Page-->
+    <string name="connection_tab_label">Connect</string>
+    <string name="drive_tab_label">Drive</string>
+    <string name="sound_tab_label">Play</string>
+    <string name="sensor_tab_label">Sense</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_tests_navhost">TestsNavhostActivity</string>
+    <!--    Connect tab-->
 
-
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_nav_host">NavHostActivity</string>
-    <string name="title_activity_main_navigation">MainNavigationActivity</string>
+    <!--    Drive tab-->
     <string name="fragment_robot_driving_label">Drive the Robot</string>
     <string name="beepButtonText">Play Sound</string>
     <string name="volume_slider_label_default">50</string>
+    <string name="open_claw_button_text">Open Claw</string>
+    <string name="close_claw_button_text">Close Claw</string>
+
+    <!--    Sound tab-->
     <string name="play_sound_file_button_label">Play Sound File</string>
     <string name="play_pre_programmed_tune_button_label">Play Preset Tune</string>
     <string name="volume_slider_label">Volume</string>
     <string name="fragment_music_player_label">Play Some Music</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--    Sensor tab-->
 
 </resources>

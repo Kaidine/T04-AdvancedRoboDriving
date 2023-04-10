@@ -22,26 +22,36 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
-    private final Context context;
-    private final String targetDeviceName;
+    private static BluetoothConnectionService INSTANCE;
+//    private Context context;
+    private String targetDeviceName;
 
 
     private BluetoothSocket bluetoothSocket;
     private InputStream socketInputStream;
     private OutputStream socketOutputStream;
 
-    public BluetoothConnectionService(Context context, String targetDeviceName) {
-        this.context = context;
-        this.targetDeviceName = targetDeviceName;
+//    public BluetoothConnectionService(Context context, String targetDeviceName) {
+//        this.context = context;
+//        this.targetDeviceName = targetDeviceName;
+//
+//    }
 
+    private BluetoothConnectionService() {}
+
+    public static BluetoothConnectionService instance(){
+        if (INSTANCE == null) {
+            INSTANCE = new BluetoothConnectionService();
+        }
+        return INSTANCE;
     }
 
-    public boolean checkBluetoothPermissions() {
-        return (
-                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-        );
-    }
+//    public boolean checkBluetoothPermissions(Context context) {
+//        return (
+//                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+//                        ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+//        );
+//    }
 
 
 
@@ -49,10 +59,10 @@ public class BluetoothConnectionService {
     public void connectToDevice() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (!checkBluetoothPermissions()) {
-            displayStatusMessage("Bluetooth permissions not granted.");
-            return;
-        }
+//        if (!checkBluetoothPermissions(context)) {
+//            displayStatusMessage("Bluetooth permissions not granted.");
+//            return;
+//        }
 
         Set<BluetoothDevice> pairedBluetoothDevices = bluetoothAdapter.getBondedDevices();
 
@@ -62,21 +72,21 @@ public class BluetoothConnectionService {
 
 
         if (!optionalBluetoothDevice.isPresent()) {
-            displayStatusMessage("Device not found in list; Pair the bluetooth device named \"" + targetDeviceName + "\" and try again.");
+//            displayStatusMessage("Device not found in list; Pair the bluetooth device named \"" + targetDeviceName + "\" and try again.");
             return;
         }
 
         BluetoothDevice targetDevice = optionalBluetoothDevice.get();
         try {
-            displayStatusMessage("Establishing connection to \"" + targetDeviceName + "\"...");
+//            displayStatusMessage("Establishing connection to \"" + targetDeviceName + "\"...");
             bluetoothSocket = targetDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
             bluetoothSocket.connect();
             socketInputStream = bluetoothSocket.getInputStream();
             socketOutputStream = bluetoothSocket.getOutputStream();
-            displayStatusMessage("Successfully connected to \"" + targetDeviceName + "\".");
+//            displayStatusMessage("Successfully connected to \"" + targetDeviceName + "\".");
 
         } catch (IOException e) {
-            displayStatusMessage("Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.");
+//            displayStatusMessage("Could not connect to device. Connect the bluetooth device named \"" + targetDeviceName + "\" and try again.");
             e.printStackTrace();
         }
     }
@@ -87,7 +97,7 @@ public class BluetoothConnectionService {
                 socketInputStream.close();
                 socketOutputStream.close();
                 bluetoothSocket.close();
-                displayStatusMessage("Successfully disconnected from \"" + targetDeviceName + "\".");
+//                displayStatusMessage("Successfully disconnected from \"" + targetDeviceName + "\".");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -97,7 +107,7 @@ public class BluetoothConnectionService {
     public void sendCommandToBluetoothDevice(byte[] byteBuffer) {
 
         if (!isConnected()){
-            displayStatusMessage("Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.");
+//            displayStatusMessage("Device \"" + targetDeviceName + "\" not connected. Attempting to establish connection.");
             connectToDevice();
         }
 
@@ -106,7 +116,7 @@ public class BluetoothConnectionService {
             socketOutputStream.flush();
 
         } catch (IOException ioException) {
-            displayStatusMessage("Failed to open outputStream for sending commands to device.");
+//            displayStatusMessage("Failed to open outputStream for sending commands to device.");
         }
     }
 
@@ -117,8 +127,8 @@ public class BluetoothConnectionService {
         return bluetoothSocket.isConnected();
     }
 
-    private void displayStatusMessage(String message) {
-        System.out.println(message);
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-    }
+//    private void displayStatusMessage(String message) {
+//        System.out.println(message);
+//        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+//    }
 }

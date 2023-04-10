@@ -2,6 +2,8 @@ package com.example.t04_advancedrobodriving.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,8 +21,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.t04_advancedrobodriving.MainNavigationActivity;
 import com.example.t04_advancedrobodriving.R;
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotDrivingBinding;
-import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
+
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,7 +71,11 @@ public class RobotDrivingFragment extends Fragment {
                              Bundle savedInstanceState) {
         String robotName = getString(R.string.robot_name);
 
-        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> robotControllerService = MainNavigationActivity.getRobotService(getContext(), robotName));
+        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result ->
+                        robotControllerService = EV3ControllerService.instance()
+        );
         activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
         binding = FragmentRobotDrivingBinding.inflate(inflater, container, false);
@@ -146,10 +153,11 @@ public class RobotDrivingFragment extends Fragment {
         });
 
         binding.beepButton.setOnClickListener(view -> {
-            NavHostFragment navHostFragment =
-                    (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host);
-            NavDirections action = RobotDrivingFragmentDirections.actionRobotDrivingFragmentToMusicPlayerFragment();
-            navHostFragment.getNavController().navigate(action);
+
+//            NavHostFragment navHostFragment =
+//                    getActivity().getSupportFragmentManager().findFragmentById(R.id.tabLayout);
+//            NavDirections action = RobotDrivingFragmentDirections.actionRobotDrivingFragmentToMusicPlayerFragment();
+//            navHostFragment.getNavController().navigate(action);
 
         });
 

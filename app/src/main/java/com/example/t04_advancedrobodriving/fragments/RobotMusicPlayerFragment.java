@@ -27,16 +27,16 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MusicPlayerFragment#newInstance} factory method to
+ * Use the {@link RobotMusicPlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MusicPlayerFragment extends Fragment {
+public class RobotMusicPlayerFragment extends Fragment {
 
     FragmentMusicPlayerBinding binding;
     private EV3ControllerService robotControllerService;
     private int volume;
 
-    public MusicPlayerFragment() {
+    public RobotMusicPlayerFragment() {
         // Required empty public constructor
     }
 
@@ -47,8 +47,8 @@ public class MusicPlayerFragment extends Fragment {
      * @return A new instance of fragment musicPlayerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MusicPlayerFragment newInstance() {
-        MusicPlayerFragment fragment = new MusicPlayerFragment();
+    public static RobotMusicPlayerFragment newInstance() {
+        RobotMusicPlayerFragment fragment = new RobotMusicPlayerFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -63,9 +63,12 @@ public class MusicPlayerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String robotName = getString(R.string.robot_name);
 
-        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> robotControllerService = MainNavigationActivity.getRobotService(getContext(), robotName));
+        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result ->
+                        robotControllerService = EV3ControllerService.instance()
+        );
         activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
         binding = FragmentMusicPlayerBinding.inflate(inflater, container, false);
