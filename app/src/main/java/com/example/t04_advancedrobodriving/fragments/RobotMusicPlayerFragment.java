@@ -126,6 +126,7 @@ public class RobotMusicPlayerFragment extends Fragment {
     private void initializeKeyboardKey(AppCompatButton button, Note frequency, int initialColor) {
         button.setBackgroundColor(getResources().getColor(initialColor));
 
+
         button.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 button.setBackgroundColor(getResources().getColor(R.color.teal_700));
@@ -137,7 +138,24 @@ public class RobotMusicPlayerFragment extends Fragment {
                 button.setBackgroundColor(getResources().getColor(initialColor));
                 robotControllerService.stopPlayingTone();
             }
+            fixButtonLayering();
             return false;
         });
+    }
+
+    public void fixButtonLayering() {
+        binding.cKey.setZ(2);
+        binding.cSharpKey.setZ(20);
+        binding.dKey.setZ(2);
+        binding.dSharpKey.setZ(20);
+        binding.eKey.setZ(2);
+        binding.fKey.setZ(2);
+        binding.fSharpKey.setZ(20);
+        binding.gKey.setZ(2);
+        binding.gSharpKey.setZ(20);
+        binding.aKey.setZ(2);
+        binding.aSharpKey.setZ(20);
+        binding.bKey.setZ(2);
+
     }
 }
