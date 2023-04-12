@@ -2,8 +2,6 @@ package com.example.t04_advancedrobodriving.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,14 +14,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.Navigation;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.t04_advancedrobodriving.MainNavigationActivity;
 import com.example.t04_advancedrobodriving.R;
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotDrivingBinding;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
-
-import java.util.Map;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,10 +45,7 @@ public class RobotDrivingFragment extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static RobotDrivingFragment newInstance() {
-        RobotDrivingFragment fragment = new RobotDrivingFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+        return new RobotDrivingFragment();
     }
 
     @Override
@@ -69,7 +64,6 @@ public class RobotDrivingFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String robotName = getString(R.string.robot_name);
 
         ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(),
@@ -153,12 +147,8 @@ public class RobotDrivingFragment extends Fragment {
         });
 
         binding.beepButton.setOnClickListener(view -> {
-
-//            NavHostFragment navHostFragment =
-//                    getActivity().getSupportFragmentManager().findFragmentById(R.id.tabLayout);
-//            NavDirections action = RobotDrivingFragmentDirections.actionRobotDrivingFragmentToMusicPlayerFragment();
-//            navHostFragment.getNavController().navigate(action);
-
+            ViewPager2 pager = (ViewPager2) getActivity().findViewById(R.id.viewPager);
+            pager.setCurrentItem(2);
         });
 
         binding.openClawButton.setOnTouchListener((view, motionEvent) -> {

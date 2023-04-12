@@ -4,8 +4,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.t04_advancedrobodriving.systemServiceWrappers.ContextCompatWrapper;
 
@@ -38,7 +40,9 @@ class BluetoothConnectionServiceTest {
     public class TestCheckBluetoothPermissions {
         @Test
         void callsContextCompatWrapperCorrectly() {
-            bluetoothConnectionService.checkBluetoothPermissions();
+            if (ContextCompat.checkSelfPermission(null, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(null, Manifest.permission.BLUETOOTH_CONNECT);
+            }
 
             verify(mockContextCompatWrapper).checkSelfPermission(mockAppCompatActivity, Manifest.permission.BLUETOOTH_SCAN);
             verify(mockContextCompatWrapper).checkSelfPermission(mockAppCompatActivity, Manifest.permission.BLUETOOTH_CONNECT);

@@ -1,9 +1,13 @@
 package com.example.t04_advancedrobodriving.services;
 
+import androidx.annotation.NonNull;
+
 import com.example.t04_advancedrobodriving.TwosComplementConverter;
 import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3DirectCommand;
 import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Motor;
 import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Opcode;
+
+import java.io.IOException;
 
 public class EV3ControllerService {
 
@@ -319,6 +323,54 @@ public class EV3ControllerService {
         playSoundFileCommandBuffer[playSoundFileCommandBufferLength - 1] = (byte) 0x00; //zero-terminate file path
 
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(playSoundFileCommandBuffer);
+    }
+
+    public float readCentimetersUntilObstacle() throws IOException {
+        byte[] getSensorDistanceCommandBuffer = buildReadSensorCommand((byte) 0x00, (byte) 0x1e, (byte) 0x00);
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getSensorDistanceCommandBuffer);
+        byte[] distanceAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice();
+        System.out.println("got distance sensor data");
+
+        return TwosComplementConverter.convertByteArrayToFloat(distanceAsIeee754Float);
+    }
+
+    public float readSurfaceBrightness() throws IOException {
+        byte[] getSurfaceBrightnessCommandBuffer = buildReadSensorCommand((byte) 0x03, (byte) 0x1d, (byte) 0x00);
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getSurfaceBrightnessCommandBuffer);
+        byte[] surfaceBrightnessAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice();
+        System.out.println("got surface sensor data");
+        return TwosComplementConverter.convertByteArrayToFloat(surfaceBrightnessAsIeee754Float);
+
+    }
+
+    @NonNull
+    private byte[] buildReadSensorCommand(byte port, byte type, byte mode) {
+        int getSensorDistanceCommandBufferLength = 15;
+        byte[] getSensorDistanceCommandBuffer = new byte[getSensorDistanceCommandBufferLength];
+
+        getSensorDistanceCommandBuffer[0] = (byte) (getSensorDistanceCommandBufferLength - 2);    // command length (2 bytes)
+        getSensorDistanceCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        getSensorDistanceCommandBuffer[2] = 0x0;                                         // message counter. unused.
+        getSensorDistanceCommandBuffer[3] = 0x0;                                          // message counter. unused.
+
+        getSensorDistanceCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_REPLY.getByteValue();
+
+        getSensorDistanceCommandBuffer[5] = 0x04;
+        getSensorDistanceCommandBuffer[6] = 0;
+
+        getSensorDistanceCommandBuffer[7] = EV3Opcode.READ_SENSOR.getByteValue();  // opcode
+
+        getSensorDistanceCommandBuffer[8] = 0x1D;                                          // read sensor in SI unit mode
+        getSensorDistanceCommandBuffer[9] = 0x00;                                          // layer 0
+        getSensorDistanceCommandBuffer[10] = port;                                          // port
+        getSensorDistanceCommandBuffer[11] = type;                                          // sensor type. 0x1e = ultrasonic, 0x1d = color
+        getSensorDistanceCommandBuffer[12] = mode;                                          // mode
+        getSensorDistanceCommandBuffer[13] = 0x01;                                          // return 1 value
+        getSensorDistanceCommandBuffer[14] = 0x60;                                          // offset???
+        return getSensorDistanceCommandBuffer;
     }
 
 }

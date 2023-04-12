@@ -1,15 +1,22 @@
 package com.example.t04_advancedrobodriving.fragments;
 
+import android.Manifest;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.example.t04_advancedrobodriving.R;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotConnectionBinding;
+import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
+
+import java.io.IOException;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +26,7 @@ import com.example.t04_advancedrobodriving.databinding.FragmentRobotConnectionBi
 public class RobotConnectionFragment extends Fragment {
 
     FragmentRobotConnectionBinding binding;
+
     public RobotConnectionFragment() {
         // Required empty public constructor
     }
@@ -40,9 +48,69 @@ public class RobotConnectionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         binding = FragmentRobotConnectionBinding.inflate(inflater, container, false);
-        return binding.getRoot();`
+        updateIndicators();
+        binding.connectButton.setOnClickListener(view -> connectToRobot());
+        binding.disconnectButton.setOnClickListener(view -> disconnectFromRobot());
+
+        ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                }
+        );
+        activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
+
+        return binding.getRoot();
     }
+
+    private void connectToRobot() {
+        updateIndicators();
+        if (!binding.getBluetoothPermissionsGranted()) {
+            Toast.makeText(getContext(), "Application requires bluetooth permissions!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String robotName = String.valueOf(binding.robotNameField.getText());
+        if (!binding.getRobotIsPaired()) {
+            Toast.makeText(getContext(), "Device not found in list; Pair the bluetooth device named \"" + robotName + "\" and try again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Executors.newCachedThreadPool().submit(() -> {
+
+            if (!BluetoothConnectionService.instance().isConnected()) {
+                boolean connectedToDevice = false;
+                try {
+                    connectedToDevice = BluetoothConnectionService.instance().connectToDevice(robotName);
+                } catch (IOException e) {
+                    Toast.makeText(getContext(), "Failed to connect to device: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                if (!connectedToDevice) {
+                    return;
+                }
+            }
+            robotConnected();
+        });
+    }
+
+    private void robotConnected() {
+        updateIndicators();
+    }
+
+    private void disconnectFromRobot() {
+        BluetoothConnectionService.instance().disconnectFromDevice();
+        updateIndicators();
+    }
+
+    private void updateIndicators() {
+        binding.setBluetoothPermissionsGranted(BluetoothConnectionService.instance().hasBluetoothPermission(getContext()));
+
+        String robotName = String.valueOf(binding.robotNameField.getText());
+        binding.setRobotIsPaired(BluetoothConnectionService.instance().robotIsInDeviceList(getContext(), robotName));
+        binding.setRobotIsConnected(BluetoothConnectionService.instance().isConnected());
+    }
+
 }

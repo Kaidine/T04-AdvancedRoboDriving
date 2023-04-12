@@ -48,9 +48,7 @@ public class CollectionRobotControlFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         collectionAdapter = new RobotControlCollectionAdapter(this);
         binding.viewPager.setAdapter(collectionAdapter);
-        viewPager = view.findViewById(R.id.viewPager);
 
-        viewPager.setAdapter(collectionAdapter);
         new TabLayoutMediator(binding.tabLayout, binding.viewPager,
                 (tab, position) -> tab.setText(tabNames.get(position))
         ).attach();
