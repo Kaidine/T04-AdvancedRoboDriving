@@ -7,8 +7,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
@@ -110,7 +108,7 @@ public class BluetoothConnectionService {
         }
     }
 
-    public byte[] readResponseFromBluetoothDevice() throws IOException {
+    public byte[] readResponseFromBluetoothDevice(byte messageCounterLowByte, byte messageCounterHighByte) throws IOException {
         try {
             boolean successfullyReadResponse = false;
             byte[] responseSizeBuffer = new byte[2];
@@ -138,11 +136,11 @@ public class BluetoothConnectionService {
                     throw new IOException("Response of Unexpected Size Received");
                 }
 
-                int sentCommand = responseBuffer[0] + (responseBuffer[1] << 8);
                 if (responseBuffer[2] != 0x04) {
                     successfullyReadResponse = true;
                 }
             }
+
             return Arrays.copyOfRange(responseBuffer, 3, responseBuffer.length);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

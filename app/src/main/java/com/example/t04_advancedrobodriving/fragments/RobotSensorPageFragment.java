@@ -197,13 +197,11 @@ public class RobotSensorPageFragment extends Fragment {
     }
 
     private void updateSurfaceBrightness(float surfaceBrightness) {
-        System.out.println("got distance: " + surfaceBrightness + " CM");
         binding.setSurfaceBrightness(surfaceBrightness);
     }
 
     private void pollDistanceSensor() {
         try {
-            System.out.println("polling distance sensor...");
             updateCentimetersToWall(
                     EV3ControllerService.instance()
                             .readCentimetersUntilObstacle()
@@ -215,7 +213,6 @@ public class RobotSensorPageFragment extends Fragment {
 
     private void pollSurfaceSensor() {
         try {
-            System.out.println("polling surface sensor...");
             updateSurfaceBrightness(
                     EV3ControllerService.instance()
                             .readSurfaceBrightness()

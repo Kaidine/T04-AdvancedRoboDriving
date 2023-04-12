@@ -2,6 +2,7 @@ package com.example.t04_advancedrobodriving.fragments;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotConnectionBinding;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
+import com.example.t04_advancedrobodriving.services.EV3ControllerService;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +29,7 @@ import java.util.concurrent.Executors;
 public class RobotConnectionFragment extends Fragment {
 
     FragmentRobotConnectionBinding binding;
+    private ThreadPoolExecutor pollingThreadPool;
 
     public RobotConnectionFragment() {
         // Required empty public constructor
@@ -52,6 +56,8 @@ public class RobotConnectionFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         binding = FragmentRobotConnectionBinding.inflate(inflater, container, false);
+        binding.setBatteryLifePercentage(null);
+
         updateIndicators();
         binding.connectButton.setOnClickListener(view -> connectToRobot());
         binding.disconnectButton.setOnClickListener(view -> disconnectFromRobot());
@@ -64,6 +70,24 @@ public class RobotConnectionFragment extends Fragment {
         activityResultLauncher.launch(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT});
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        stopPollingBatteryLife();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopPollingBatteryLife();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startPollingBatteryLife();
     }
 
     private void connectToRobot() {
@@ -93,15 +117,50 @@ public class RobotConnectionFragment extends Fragment {
                 }
             }
             robotConnected();
-        });
-    }
+            startPollingBatteryLife();
 
-    private void robotConnected() {
-        updateIndicators();
+        });
     }
 
     private void disconnectFromRobot() {
         BluetoothConnectionService.instance().disconnectFromDevice();
+        stopPollingBatteryLife();
+        updateIndicators();
+    }
+
+    private void startPollingBatteryLife() {
+        stopPollingBatteryLife();
+        pollingThreadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
+        pollingThreadPool.submit(() -> {
+            while (true) {
+                pollBatteryLife();
+                SystemClock.sleep(10000);
+            }
+        });
+    }
+
+    private void stopPollingBatteryLife() {
+        if (pollingThreadPool != null) pollingThreadPool.shutdownNow();
+        updateBatteryLife(null);
+    }
+
+    private void pollBatteryLife() {
+        try {
+            updateBatteryLife(
+                    EV3ControllerService.instance()
+                            .getPercentBatteryRemaining()
+            );
+        } catch (IOException e) {
+            System.out.println("Error While Reading battery life: " + e.getMessage());
+        }
+    }
+
+    private void updateBatteryLife(Float batteryLife) {
+        binding.setBatteryLifePercentage(batteryLife);
+    }
+
+    private void robotConnected() {
         updateIndicators();
     }
 

@@ -12,11 +12,12 @@ import java.io.IOException;
 public class EV3ControllerService {
 
     private static EV3ControllerService INSTANCE;
+
     private EV3ControllerService() {
     }
 
-    public static EV3ControllerService instance(){
-        if (INSTANCE == null){
+    public static EV3ControllerService instance() {
+        if (INSTANCE == null) {
             INSTANCE = new EV3ControllerService();
         }
         return INSTANCE;
@@ -260,7 +261,7 @@ public class EV3ControllerService {
         playToneCommandBuffer[8] = (byte) 0x01;                                          // Play a tone
         byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
 
-        playToneCommandBuffer[9] = (byte)0x81; // volume 0-100
+        playToneCommandBuffer[9] = (byte) 0x81; // volume 0-100
         playToneCommandBuffer[10] = volumeAsBytes[0]; // volume 0-100
         playToneCommandBuffer[11] = (byte) 0x82;                               // LC2 - two bytes to follow
         byte[] frequencyAsBytes = TwosComplementConverter.convertIntToTwosComplement(frequency);
@@ -293,7 +294,8 @@ public class EV3ControllerService {
 
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(playToneCommandBuffer);
     }
-    public void playSoundFile(int volume){
+
+    public void playSoundFile(int volume) {
         String pathToSoundFile = "/home/root/lms2012/prjs/Sounds/Blip 4";
         byte[] filePathBytes = pathToSoundFile.getBytes();
 
@@ -316,7 +318,7 @@ public class EV3ControllerService {
         playSoundFileCommandBuffer[8] = (byte) 0x02;                                          // Play a file
         byte[] volumeAsBytes = TwosComplementConverter.convertIntToTwosComplement(volume);
 
-        playSoundFileCommandBuffer[9] = (byte)0x81; // volume 0-100
+        playSoundFileCommandBuffer[9] = (byte) 0x81; // volume 0-100
         playSoundFileCommandBuffer[10] = volumeAsBytes[0]; // volume 0-100
         playSoundFileCommandBuffer[11] = (byte) 0x84;                               // LCS - zero-terminated string to follow
         System.arraycopy(filePathBytes, 0, playSoundFileCommandBuffer, 12, filePathBytes.length);
@@ -326,35 +328,66 @@ public class EV3ControllerService {
     }
 
     public float readCentimetersUntilObstacle() throws IOException {
-        byte[] getSensorDistanceCommandBuffer = buildReadSensorCommand((byte) 0x00, (byte) 0x1e, (byte) 0x00);
+        byte messageCounterLow = (byte) 0x01;
+        byte messageCounterHigh = (byte) 0x00;
+        byte[] getSensorDistanceCommandBuffer = buildReadSensorCommand((byte) 0x00, (byte) 0x1e, (byte) 0x00, messageCounterLow, messageCounterHigh);
 
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getSensorDistanceCommandBuffer);
-        byte[] distanceAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice();
-        System.out.println("got distance sensor data");
+        byte[] distanceAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice(messageCounterLow, messageCounterHigh);
 
         return TwosComplementConverter.convertByteArrayToFloat(distanceAsIeee754Float);
     }
 
     public float readSurfaceBrightness() throws IOException {
-        byte[] getSurfaceBrightnessCommandBuffer = buildReadSensorCommand((byte) 0x03, (byte) 0x1d, (byte) 0x00);
+        byte messageCounterLow = (byte) 0x02;
+        byte messageCounterHigh = (byte) 0x00;
+        byte[] getSurfaceBrightnessCommandBuffer = buildReadSensorCommand((byte) 0x03, (byte) 0x1d, (byte) 0x00, messageCounterLow, messageCounterHigh);
 
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getSurfaceBrightnessCommandBuffer);
-        byte[] surfaceBrightnessAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice();
-        System.out.println("got surface sensor data");
+        byte[] surfaceBrightnessAsIeee754Float = BluetoothConnectionService.instance().readResponseFromBluetoothDevice(messageCounterLow, messageCounterHigh);
         return TwosComplementConverter.convertByteArrayToFloat(surfaceBrightnessAsIeee754Float);
 
     }
 
+    public float getPercentBatteryRemaining() throws IOException {
+        int getPercentBatteryCommandBufferLength = 10;
+        byte[] getPercentBatteryCommandBuffer = new byte[getPercentBatteryCommandBufferLength];
+
+        getPercentBatteryCommandBuffer[0] = (byte) (getPercentBatteryCommandBufferLength - 2);    // command length (2 bytes)
+        getPercentBatteryCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        byte messageCounterLow = (byte) 0x03;
+        byte messageCounterHigh = (byte) 0x00;
+        getPercentBatteryCommandBuffer[2] = messageCounterLow;                                         // message counter. unused.
+        getPercentBatteryCommandBuffer[3] = messageCounterHigh;                                          // message counter. unused.
+
+        getPercentBatteryCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_REPLY.getByteValue();
+
+        getPercentBatteryCommandBuffer[5] = 0x04;
+        getPercentBatteryCommandBuffer[6] = 0;
+
+        getPercentBatteryCommandBuffer[7] = EV3Opcode.UI_READ.getByteValue();  // opcode
+
+        getPercentBatteryCommandBuffer[8] = 0x12;                                          // read battery life as percentage
+        getPercentBatteryCommandBuffer[9] = 0x60;                                          // not specified, but breaks without it???
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getPercentBatteryCommandBuffer);
+
+        byte[] batteryLifeAsInt = BluetoothConnectionService.instance().readResponseFromBluetoothDevice(messageCounterLow, messageCounterHigh);
+
+        return (int) batteryLifeAsInt[0];
+    }
+
     @NonNull
-    private byte[] buildReadSensorCommand(byte port, byte type, byte mode) {
+    private byte[] buildReadSensorCommand(byte port, byte type, byte mode, byte messageCounterLowByte, byte messageCounterHighByte) {
         int getSensorDistanceCommandBufferLength = 15;
         byte[] getSensorDistanceCommandBuffer = new byte[getSensorDistanceCommandBufferLength];
 
         getSensorDistanceCommandBuffer[0] = (byte) (getSensorDistanceCommandBufferLength - 2);    // command length (2 bytes)
         getSensorDistanceCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
 
-        getSensorDistanceCommandBuffer[2] = 0x0;                                         // message counter. unused.
-        getSensorDistanceCommandBuffer[3] = 0x0;                                          // message counter. unused.
+        getSensorDistanceCommandBuffer[2] = messageCounterLowByte;                                         // message counter.
+        getSensorDistanceCommandBuffer[3] = messageCounterHighByte;                                          // message counter.
 
         getSensorDistanceCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_REPLY.getByteValue();
 
