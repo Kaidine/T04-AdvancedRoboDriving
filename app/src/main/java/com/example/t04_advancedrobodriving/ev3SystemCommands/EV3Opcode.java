@@ -7,7 +7,8 @@ public enum EV3Opcode {
     OUTPUT_STEP_SPEED((byte) 0xae),
     OUTPUT_STEP_SYNC((byte) 0xb0),
     PLAY_SOUND((byte) 0x94),
-    READ_SENSOR((byte) 0x99);
+    READ_SENSOR((byte) 0x99),
+    RESET_MOTOR_ROTATION_COUNT((byte) 0xA2);
     private final byte byteValue;
 
     EV3Opcode(byte byteValue) {

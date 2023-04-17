@@ -8,6 +8,7 @@ import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Motor;
 import com.example.t04_advancedrobodriving.ev3SystemCommands.EV3Opcode;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class EV3ControllerService {
 
@@ -23,48 +24,18 @@ public class EV3ControllerService {
         return INSTANCE;
     }
 
-    public void playTone() {
-        byte[] buffer = new byte[17];       // 0x0f command length
-
-        buffer[0] = (byte) (17 - 2);
-        buffer[1] = 0;
-
-        buffer[2] = 34;
-        buffer[3] = 12;
-
-        buffer[4] = (byte) 0x80;
-
-        buffer[5] = 0;
-        buffer[6] = 0;
-
-        buffer[7] = (byte) 0x94;
-        buffer[8] = 1;
-
-        buffer[9] = (byte) 0x81;
-        buffer[10] = (byte) 0x02;
-
-        buffer[11] = (byte) 0x82;
-        buffer[12] = (byte) 0xe8;
-        buffer[13] = (byte) 0x03;
-
-        buffer[14] = (byte) 0x82;
-        buffer[15] = (byte) 0xe8;
-        buffer[16] = (byte) 0x03;
-
-        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(buffer);
-    }
-
     public void startRobotMoving(int speed) {
+        System.out.println("startRobotMoving");
         byte motorsAsSingleByte = (byte) (EV3Motor.B.getByteValue() ^ EV3Motor.C.getByteValue());
 
         int syncMovementCommandBufferLength = 15;
         byte[] syncMovementCommandBuffer = new byte[syncMovementCommandBufferLength];
 
         syncMovementCommandBuffer[0] = (byte) (syncMovementCommandBufferLength - 2);    // command length (2 bytes)
-        syncMovementCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+        syncMovementCommandBuffer[1] = 0x0;                                // command length *not* including these two bytes
 
-        syncMovementCommandBuffer[2] = 0x0;                                         // message counter. unused.
-        syncMovementCommandBuffer[3] = 0x0;                                          // message counter. unused.
+        syncMovementCommandBuffer[2] = 0x0;                                // message counter. unused.
+        syncMovementCommandBuffer[3] = 0x0;                                // message counter. unused.
 
         syncMovementCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
 
@@ -73,28 +44,82 @@ public class EV3ControllerService {
 
         syncMovementCommandBuffer[7] = EV3Opcode.OUTPUT_STEP_SYNC.getByteValue();  // opcode
 
-        syncMovementCommandBuffer[8] = 0;                                          // run on layer 0 (LAYER_0)
-        syncMovementCommandBuffer[9] = (byte) motorsAsSingleByte;                  // motors   |D|C|B|A|
+        syncMovementCommandBuffer[8] = 0;                                  // run on layer 0 (LAYER_0)
+        syncMovementCommandBuffer[9] = (byte) motorsAsSingleByte;          // motors   |D|C|B|A|
         //                      |-|-|-|-|
         //                      |0|1|1|0| = 0x06
 
         //set speed
-        syncMovementCommandBuffer[10] = (byte) 0x81;                               // LC1 - one byte to follow
+        syncMovementCommandBuffer[10] = (byte) 0x81;                       // LC1 - one byte to follow
         syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
 
         // set turning ratio. 0 = matching.
-        syncMovementCommandBuffer[12] = (byte) 0x0;                               // LC0 - constant (ratio = 0)
+        syncMovementCommandBuffer[12] = (byte) 0x0;                        // LC0 - constant (ratio = 0)
+//        syncMovementCommandBuffer[12] = (byte) 0xc8;                        // LC0 - constant (ratio = 0)
 
-        // tach pulses (rotations), 0=infinite
-        syncMovementCommandBuffer[13] = (byte) 0x0;                               // LC0 - constant (pulses = 0)
+        syncMovementCommandBuffer[13] = (byte) 0x0;                          // LC0 - constant pulses (0)
 
         //braking level, 0= float, 1 =brake
-        syncMovementCommandBuffer[14] = (byte) 0x01;                               // LC0 - constant (brake)
+        syncMovementCommandBuffer[14] = (byte) 0x01;                       // LC0 - constant (brake)
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
+    }
+
+    public void moveRobotFixedDistance(int speed, int pulses) {
+        byte motorsAsSingleByte = (byte) (EV3Motor.B.getByteValue() ^ EV3Motor.C.getByteValue());
+
+        int syncMovementCommandBufferLength = 17;
+        byte[] syncMovementCommandBuffer = new byte[syncMovementCommandBufferLength];
+
+        syncMovementCommandBuffer[0] = (byte) (syncMovementCommandBufferLength - 2);    // command length (2 bytes)
+        syncMovementCommandBuffer[1] = 0x0;                                // command length *not* including these two bytes
+
+        syncMovementCommandBuffer[2] = 0x0;                                // message counter. unused.
+        syncMovementCommandBuffer[3] = 0x0;                                // message counter. unused.
+
+        syncMovementCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        syncMovementCommandBuffer[5] = 0;
+        syncMovementCommandBuffer[6] = 0;
+
+        syncMovementCommandBuffer[7] = EV3Opcode.OUTPUT_STEP_SYNC.getByteValue();  // opcode
+
+        syncMovementCommandBuffer[8] = 0;                                  // run on layer 0 (LAYER_0)
+        syncMovementCommandBuffer[9] = (byte) motorsAsSingleByte;          // motors   |D|C|B|A|
+        //                      |-|-|-|-|
+        //                      |0|1|1|0| = 0x06
+
+        //set speed
+        syncMovementCommandBuffer[10] = (byte) 0x81;                       // LC1 - one byte to follow
+        syncMovementCommandBuffer[11] = TwosComplementConverter.convertIntToTwosComplement(speed)[0];
+
+        // set turning ratio. 0 = matching.
+        syncMovementCommandBuffer[12] = (byte) 0x0;                       // LC0 - constant (ratio = 0)
+
+        syncMovementCommandBuffer[13] = (byte) 0x82;                       // LC2 - two bytes to follow
+
+        // tach pulses (rotations), 0=infinite
+        System.out.println("pulses: " + pulses);
+        byte[] pulsesAsBytes = TwosComplementConverter.convertIntToTwosComplement(pulses);
+        StringBuilder pulseBytesString = new StringBuilder("[ ");
+
+        for (byte b : pulsesAsBytes)
+            pulseBytesString.append(String.format("%02x ", b));
+
+        pulseBytesString.append("]");
+        System.out.println("pulses as byte array: " + pulseBytesString);
+        System.out.println("pulse bytes: " + Arrays.toString(pulsesAsBytes));
+        syncMovementCommandBuffer[14] = pulsesAsBytes[0];                  // LC4 - constant (pulses = 0)
+        syncMovementCommandBuffer[15] = pulsesAsBytes[1];                  // LC4 - constant (pulses = 0)
+
+        //braking level, 0= float, 1 =brake
+        syncMovementCommandBuffer[16] = (byte) 0x01;                       // LC0 - constant (brake)
 
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(syncMovementCommandBuffer);
     }
 
     public void stopRobotMoving() {
+        System.out.println("stopRobotMoving");
         startRobotMoving(0);
     }
 
@@ -374,8 +399,58 @@ public class EV3ControllerService {
         BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getPercentBatteryCommandBuffer);
 
         byte[] batteryLifeAsInt = BluetoothConnectionService.instance().readResponseFromBluetoothDevice(messageCounterLow, messageCounterHigh);
-
+        System.out.println("got battery life:" + Arrays.toString(batteryLifeAsInt));
         return (int) batteryLifeAsInt[0];
+    }
+
+    public void resetMotorRotationCounter() {
+        byte motorsAsSingleByte = (byte) EV3Motor.B.getByteValue();
+
+        int resetRotationCountCommandBufferLength = 10;
+
+        byte[] resetRotationCountCommandBuffer = new byte[resetRotationCountCommandBufferLength];
+        resetRotationCountCommandBuffer[0] = (byte) (resetRotationCountCommandBufferLength - 2);    // command length (2 bytes)
+        resetRotationCountCommandBuffer[1] = 0x0;                                         // command length *not* including these two bytes
+
+        resetRotationCountCommandBuffer[2] = (byte) 0x00;                                         // message counter. unused.
+        resetRotationCountCommandBuffer[3] = (byte) 0x00;                                          // message counter. unused.
+
+        resetRotationCountCommandBuffer[4] = EV3DirectCommand.DIRECT_COMMAND_NOREPLY.getByteValue();
+
+        resetRotationCountCommandBuffer[5] = 0x04;  //don't reserve any global or local variable
+        resetRotationCountCommandBuffer[6] = 0x00;  //don't reserve any global or local variable
+
+        resetRotationCountCommandBuffer[7] = EV3Opcode.RESET_MOTOR_ROTATION_COUNT.getByteValue();  // opcode
+
+        resetRotationCountCommandBuffer[8] = 0x00;                                          // Layer 0
+        System.out.println("motors as single byte: " + motorsAsSingleByte);
+        resetRotationCountCommandBuffer[9] = motorsAsSingleByte;                                          // output ports to reset values for
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(resetRotationCountCommandBuffer);
+    }
+
+    public float getMotorRotationInDegrees() throws IOException {
+        System.out.println("getMotorRotationInDegrees");
+        byte messageCounterLow = (byte) 0x04;
+        byte messageCounterHigh = (byte) 0x00;
+        byte motorBAsByte = (byte) 0x11;
+        byte[] getSensorDistanceCommandBuffer = buildReadSensorCommand(motorBAsByte, (byte) 0x07, (byte) 0x00, messageCounterLow, messageCounterHigh);
+
+        BluetoothConnectionService.instance().sendCommandToBluetoothDevice(getSensorDistanceCommandBuffer);
+
+        byte[] rotationsAsBytes = BluetoothConnectionService.instance().readResponseFromBluetoothDevice(messageCounterLow, messageCounterHigh);
+
+        StringBuilder rotationBytesString = new StringBuilder("[ ");
+        for (byte b : rotationsAsBytes)
+            rotationBytesString.append(String.format("%02x ", b));
+
+        rotationBytesString.append("]");
+        System.out.println("rotations as byte array: " + rotationBytesString);
+        System.out.println("buitlin arrays method: " + Arrays.toString(rotationsAsBytes));
+        float rotations = TwosComplementConverter.convertByteArrayToFloat(rotationsAsBytes);
+
+        System.out.println("rotations as float: " + rotations);
+        return rotations;
     }
 
     @NonNull

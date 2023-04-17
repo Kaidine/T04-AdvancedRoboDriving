@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.SystemClock;
 
 import androidx.core.content.ContextCompat;
 
@@ -109,42 +110,33 @@ public class BluetoothConnectionService {
     }
 
     public byte[] readResponseFromBluetoothDevice(byte messageCounterLowByte, byte messageCounterHighByte) throws IOException {
-        try {
-            boolean successfullyReadResponse = false;
-            byte[] responseSizeBuffer = new byte[2];
-            byte[] responseBuffer = new byte[0];
-            while (!successfullyReadResponse) {
-                Thread.sleep(50);
-
-                int bytesAvailable = 0;
-                while (bytesAvailable == 0) {
-                    //wait for response to be ready
-                    Thread.sleep(50);
-                    bytesAvailable = socketInputStream.available();
-                }
-
-                int bytesRead = socketInputStream.read(responseSizeBuffer, 0, 2);
-                if (bytesRead != 2) {
-                    throw new IOException("Invalid response size received.");
-                }
-
-                int responseSize = responseSizeBuffer[0] + (responseSizeBuffer[1] << 8);
-                responseBuffer = new byte[responseSize];
-                bytesRead = socketInputStream.read(responseBuffer);
-
-                if (bytesRead != responseSize) {
-                    throw new IOException("Response of Unexpected Size Received");
-                }
-
-                if (responseBuffer[2] != 0x04) {
-                    successfullyReadResponse = true;
-                }
+        boolean successfullyReadResponse = false;
+        byte[] responseSizeBuffer = new byte[2];
+        byte[] responseBuffer = new byte[0];
+        while (!successfullyReadResponse) {
+            SystemClock.sleep(50);
+            int bytesAvailable = 0;
+            while (bytesAvailable == 0) {
+                //wait for response to be ready
+                SystemClock.sleep(50);
+                bytesAvailable = socketInputStream.available();
             }
 
-            return Arrays.copyOfRange(responseBuffer, 3, responseBuffer.length);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            int bytesRead = socketInputStream.read(responseSizeBuffer, 0, 2);
+            if (bytesRead != 2) {
+                throw new IOException("Invalid response size received.");
+            }
+            int responseSize = responseSizeBuffer[0] + (responseSizeBuffer[1] << 8);
+            responseBuffer = new byte[responseSize];
+            bytesRead = socketInputStream.read(responseBuffer);
+            if (bytesRead != responseSize) {
+                throw new IOException("Response of Unexpected Size Received");
+            }
+            if (responseBuffer[2] != 0x04) {
+                successfullyReadResponse = true;
+            }
         }
+        return Arrays.copyOfRange(responseBuffer, 3, responseBuffer.length);
     }
 
     public boolean isConnected() {

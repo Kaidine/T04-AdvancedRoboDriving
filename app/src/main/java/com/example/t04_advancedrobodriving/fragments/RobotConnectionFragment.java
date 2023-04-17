@@ -1,6 +1,7 @@
 package com.example.t04_advancedrobodriving.fragments;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.t04_advancedrobodriving.R;
 import com.example.t04_advancedrobodriving.databinding.FragmentRobotConnectionBinding;
 import com.example.t04_advancedrobodriving.services.BluetoothConnectionService;
 import com.example.t04_advancedrobodriving.services.EV3ControllerService;
@@ -87,6 +89,7 @@ public class RobotConnectionFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        updateBatteryLife(null);
         startPollingBatteryLife();
     }
 
@@ -104,13 +107,12 @@ public class RobotConnectionFragment extends Fragment {
         }
 
         Executors.newCachedThreadPool().submit(() -> {
-
             if (!BluetoothConnectionService.instance().isConnected()) {
                 boolean connectedToDevice = false;
                 try {
                     connectedToDevice = BluetoothConnectionService.instance().connectToDevice(robotName);
                 } catch (IOException e) {
-                    Toast.makeText(getContext(), "Failed to connect to device: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    makeToast("Failed to connect to device: " + e.getMessage());
                 }
                 if (!connectedToDevice) {
                     return;
@@ -158,6 +160,12 @@ public class RobotConnectionFragment extends Fragment {
 
     private void updateBatteryLife(Float batteryLife) {
         binding.setBatteryLifePercentage(batteryLife);
+    }
+
+    private void makeToast(String message) {
+        System.out.println("Connection failed: " + message);
+        Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
     }
 
     private void robotConnected() {

@@ -11,8 +11,8 @@
     <!--    Connect tab-->
     <string name="remaining_battery_life_label">Remaining Battery Life:</string>
     <string name="remaining_battery_life_null">-----%</string>
-    <!--    <string name="remaining_battery_life">%d%%</string>-->
-    <string name="remaining_battery_life">%1$.2f%%</string>
+    <string name="remaining_battery_life">%1$.0f%%</string>
+    <string name="connecting_indicator_title">Connecting…</string>
     <string name="has_permissions_label">App has Bluetooth Permissions</string>
     <string name="robot_in_list_label">Robot is in Paired Device List</string>
     <string name="robot_connected_label">Connected to Robot</string>
